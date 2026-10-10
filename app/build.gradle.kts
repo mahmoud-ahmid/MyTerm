@@ -106,7 +106,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.linbox"
+        applicationId = "com.mterm.app"
         minSdk = 24
 
         // ============================================================
