@@ -79,10 +79,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
-      KEYSTORE_PATH: ${{ github.workspace }}/linbox-release.keystore
-      KEYSTORE_PASS: linbox-release-pass-2026
-      KEY_ALIAS: linbox
-      KEY_PASS: linbox-release-pass-2026
+      KEYSTORE_PATH: ${{ github.workspace }}/mterm-release.keystore
+      KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASSWORD }}
+      KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+      KEY_PASS: ${{ secrets.KEY_PASSWORD }}
 
     steps:
       # ============ 1. 检出 ============
@@ -128,16 +128,11 @@ jobs:
           fi
           ls -lh gradle/wrapper/
 
-      # ============ 6. release keystore（debug 签名会被判 testOnly 拒装） ============
-      - name: 🔑 Generate release keystore
+      # ============ 6. فك keystore من الأسرار (مفتاح mTerm الخاص) ============
+      - name: 🔑 Decode release keystore
         run: |
-          keytool -genkeypair -v \
-            -keystore linbox-release.keystore \
-            -alias linbox \
-            -keyalg RSA -keysize 2048 -validity 10000 \
-            -storepass linbox-release-pass-2026 \
-            -keypass linbox-release-pass-2026 \
-            -dname "CN=LinBox, OU=Dev, O=LinBox, L=Beijing, ST=Beijing, C=CN"
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > mterm-release.keystore
+          ls -lh mterm-release.keystore
 
       - name: 📝 Write local.properties
         run: echo "sdk.dir=$ANDROID_HOME" > local.properties
